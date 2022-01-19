@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+<style type="text/css">
+
+path:hover {
+	fill-opacity: .8;
+}
+
+div.tooltip {   
+ 	position: absolute;           
+	text-align: center;           
+	width: 60px;                  
+	height: 28px;                 
+	padding: 2px;             
+	font: 12px sans-serif;        
+	background: white;   
+	border: 0px;      
+	border-radius: 8px;           
+	pointer-events: none;         
+}
+        
+/* Legend */
+body {
+	font: 11px sans-serif;
+}
+        
+/* Legend Position */
+.legend {
+	position:absolute;
+	left:800px;
+	top:350px;
+}
+div {
+      text-align: center;
+    };
+
+</style>
+</head>
+<body>
+    <div name='states'>
+        <h1> Assignment 6 : Vaccination-percentage map  </h1>
+        <h3> sagarp95@uab.edu</h3>
+    </div>
+<script type="text/javascript">
+
+		
+//Width and height of map
+var width = 800;
+var height = 500;
+
+// D3 Projection
+ var projection = d3.geoAlbersUsa()
+ 				   .translate([width/2, height/2])    
+ 				   .scale([1000]);          
+        
+var path = d3.geoPath().projection(projection);  
+		  	                                    
+var color = d3.scaleLinear()
+			    .range(["#ff9966","#ff7733","#ff5500","#cc4400"]);
+
+var legendText = ["Group 1: 0<=p<=19%", "Group 2: 19%<p<=21%","Group 3: 21%<p<=23%", "Group 4: p>23%"];
+
+var svg = d3.select("body")
+			.append("svg")
+			.attr("height", height)
+            .attr("width", width);
+        
+var div = d3.select("body")
+		    .append("div")   
+    		.style("opacity", 0)
+            .attr("class", "tooltip") ;
+
+// Load in Vaccine data
+d3.csv("vaccine.csv").then(function(vaccineData) {
+    console.log(vaccineData)
+color.domain([0,1,2,3]); 
+
+// Load US-States data
+d3.json("us-states.json").then(function(stateData) {
+
+for (var i = 0; i < vaccineData.length; i++) {
+    console.log("Entering Vaccine CSV")
+	// Get State Name
+      var getVaccineState = vaccineData[i].state;
+      console.log("vaccineGetState: "+"i["+i+"] "+getVaccineState);
+
+	// Get one_dose vaccine value
+	var oneDoseValue = vaccineData[i].one_dose;
+    //console.log("vaccineData.onedose: "+oneDoseValue)
+
+	for (var j = 0; j < stateData.features.length; j++)  {
+		var getUSStatedata = stateData.features[j].properties.name;
+
+		if (getUSStatedata == getVaccineState) {
+		// Copy the oneDoseValue into the JSON
+        stateData.features[j].properties.one_dose = oneDoseValue; 
+		break;
+		}
+	}
+}
+		
+svg.selectAll("path")
+	.data(stateData.features)
+	.enter()
+	.append("path")
+	.attr("d", path)
+	.style("stroke", "#595959")
+	.style("stroke-width", "1")
+	.style("fill", function(d) {
+
+	// Get one_dose value
+	var onedoseValue = d.properties.one_dose;
+    console.log("value"+onedoseValue)
+
+	if (onedoseValue<=19) {
+	return "#ff9966";
+	} else if(onedoseValue <= 21){
+	return "#ff7733";
+	} else if(onedoseValue <=23)
+        return "#ff5500";
+    else if(onedoseValue>23){
+        return "#cc4400";
+    }
+});
+
+
+//Legend Code
+var legend = d3.select("body").append("svg")
+      			.attr("class", "legend")
+     			.attr("width", 148)
+    			.attr("height", 480)
+   				.selectAll("g")
+   				.data(color.domain().slice())
+   				.enter()
+   				.append("g")
+     			.attr("transform", function(d, i) { return "translate(0," + i * 18 + ")"; });
+
+  	legend.append("rect")
+   		  .attr("width", 20)
+   		  .attr("height", 20)
+   		  .style("fill", color);
+
+  	legend.append("text")
+  		  .data(legendText)
+      	  .attr("x", 24)
+      	  .attr("y", 9)
+      	  .attr("dy", ".45em")
+      	  .text(function(data) { return data; });
+	});
+
+});
+</script>
+</body>
+</html>

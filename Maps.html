@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<!-- v3 supports d3.geo.albersUsa() -->
+		
+		<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+		<style type="text/css">
+			/* On mouse hover, lighten state color */
+            * {
+                font-family: "Helvetica Neue";
+            }
+            p {
+                font-size: 0.85em;
+            }
+			path:hover {
+				fill-opacity: .7;
+			}
+			div {
+      text-align: center;
+    	};
+       
+		</style>
+	</head>
+	<body>
+		<div name='headings'>
+			<h3> Which States Have Vaccinated More Of Their Population </h3>
+			<p> sagarp95@uab.edu </p>
+		</div>
+		</div>
+			<div id="map">
+		</div>
+		
+        <!-- D3 Graphing Library-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.6.2/d3.min.js"></script>
+
+        <!-- Topojson library: pass geographic data-->
+        <script src="http://d3js.org/topojson.v1.min.js"></script>
+
+        <script src="projection.js"></script>
+
+	</body>
+</html>
